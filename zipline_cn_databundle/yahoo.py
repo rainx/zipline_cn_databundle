@@ -26,7 +26,9 @@ def register_cn_bundle_from_yahoo(name):
     :param name: the name of bundle
     :return: register result
     """
+    symbol_list = get_all_yahoo_stock_names()
+
     return register(
         name,
-        yahoo_equities(get_all_yahoo_stock_names()),
+        yahoo_equities(dict(list(zip(symbol_list, symbol_list)))),
     )
