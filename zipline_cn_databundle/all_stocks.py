@@ -29,9 +29,8 @@ def get_all_stocks(cache=True):
 
     #use cache
     if cache and os.path.isfile(cache_path):
-        df = pd.read_csv(cache_path, dtype={
-            'code': 'object'
-        })
+        df = pd.read_csv(cache_path,  dtype={'code': 'object'})
+        df = df.set_index('code')
         return df
 
     response = requests.get(ALL_STOCKS_URL)
