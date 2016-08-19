@@ -1,17 +1,17 @@
 from zipline.data.bundles import register, yahoo_equities
 import requests
-
+import os
 """
 For ingest chinese history day bar from Yahoo
 
 From both Shenzhen And Shanghai Stock Exchange
 """
 
-from .all_stocks import get_all_stocks
+from .all_stocks import get_all_stocks, get_cache_dir
 
 
-def get_all_yahoo_stock_names():
-    all_stocks = get_all_stocks()
+def get_all_yahoo_stock_names(cache=True):
+    all_stocks = get_all_stocks(cache=cache)
 
     return [full_code(code) for code in all_stocks.index]
 
@@ -21,13 +21,13 @@ def full_code(code):
     else:
         return '%s.SZ' % code
 
-def register_cn_bundle_from_yahoo(name):
+def register_cn_bundle_from_yahoo(name, cache=True):
     """
     register a new bundle of stocks from chinese market from yahoo
     :param name: the name of bundle
     :return: register result
     """
-    symbol_list = get_cn_stocks_from_yahoo_lookup()
+    symbol_list = get_filtered_symbols(cache)
 
     return register(
         name,
@@ -59,11 +59,20 @@ def check_code(code):
 
     return False
 
+def get_filtered_symbols(cache=True):
+    cache_dir = get_cache_dir()
+    file_path = os.path.join(cache_dir, 'symbols.txt')
 
-if __name__ == '__main__':
-    symbols = get_all_yahoo_stock_names()
+    if cache and os.path.isfile(file_path):
+        with open(file_path, 'r') as f:
+            content = f.read()
+            if content:
+                return content.split("\n")
+
+    symbols = get_all_yahoo_stock_names(cache)
     filtered_symbols = list(filter(check_code, symbols))
-    print('output to symbols.txt')
-    with open('symbols.txt', 'w') as f:
+    print('cache output to %s' % file_path)
+    with open(file_path, 'w') as f:
         f.write("\n".join(filtered_symbols))
     print('done!')
+    return filtered_symbols

@@ -11,13 +11,17 @@ import sys
 
 ALL_STOCKS_URL = 'http://218.244.146.57/static/all.csv'
 
-def get_cache_path():
+
+def get_cache_dir():
     home_path = os.path.expanduser('~')
     cache_dir = os.path.join(home_path, '.zipline_cn_databundle')
 
     if not os.path.isdir(cache_dir):
         os.makedirs(cache_dir)
+    return cache_dir
 
+def get_cache_path():
+    cache_dir = get_cache_dir()
     return os.path.join(cache_dir, 'all_stocks.csv')
 
 def get_all_stocks(cache=True):
