@@ -11,6 +11,9 @@ from .all_stocks import get_all_stocks, get_cache_dir
 
 
 def get_all_yahoo_stock_names(cache=True):
+
+    if cache==False:
+        print('Get All Stock List.....')
     all_stocks = get_all_stocks(cache=cache)
 
     return [full_code(code) for code in all_stocks.index]
@@ -51,12 +54,14 @@ def check_code(code):
         if len(items) > 0:
             for item in items:
                 if item['symbol'].upper() == code.upper():
+                    print('.')
                     return True
 
     except Exception as e:
         print(str(e))
         return False
 
+    print('x')
     return False
 
 def get_filtered_symbols(cache=True):
@@ -70,6 +75,9 @@ def get_filtered_symbols(cache=True):
                 return content.split("\n")
 
     symbols = get_all_yahoo_stock_names(cache)
+
+    if cache==False:
+        print('Check availablity from Yahoo...')
     filtered_symbols = list(filter(check_code, symbols))
     print('cache output to %s' % file_path)
     with open(file_path, 'w') as f:

@@ -29,6 +29,14 @@ from zipline_cn_databundle import register_cn_bundle_from_yahoo
 register_cn_bundle_from_yahoo('cn_exchange_yahoo')
 ```
 
+the first time you used databundle, we will download and check availablity from yahoo.
+we and the second time you use this api ,we will use cached symbol list directly,
+if you prefer update the data list or do not use the cached version, you could use:
+
+```
+ register_cn_bundle_from_yahoo('cn_exchange_yahoo', cache=False)
+```
+instead
 
 ### Others
 
