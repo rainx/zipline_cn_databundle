@@ -44,10 +44,8 @@ def check_code(code):
         'Referer'       : 'http://finance.yahoo.com/',
         'User-Agent'    : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36',
     })
-
-    data = response.json()
-
     try:
+        data = response.json()
         items = data['data']['items']
 
         if len(items) > 0:
@@ -55,7 +53,8 @@ def check_code(code):
                 if item['symbol'].upper() == code.upper():
                     return True
 
-    except:
+    except Exception as e:
+        print(str(e))
         return False
 
     return False
