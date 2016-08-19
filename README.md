@@ -38,6 +38,20 @@ if you prefer update the data list or do not use the cached version, you could u
 ```
 instead
 
+and if you wanna fetch and cache the info before use it, you can run command in console:
+
+`zipline-cn-databundle-update`
+
+```
+> zipline-cn-databundle-update
+Start to fetch data and update cache
+Get All Stock List.....
+Check availablity from Yahoo...
+300533.SZ ok!
+...
+....
+```
+
 ### Others
 
 #### Get All Stocks info in Chinese Market
