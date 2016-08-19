@@ -7,7 +7,8 @@ from pprint import  pprint
 
 
 if __name__ == '__main__':
-    get_filtered_symbols()
+    symbols = get_filtered_symbols()
+    pprint(symbols)
 
 
 
