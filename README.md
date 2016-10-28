@@ -17,40 +17,9 @@ python setup.py install
 Usage
 ----
 
-### Register in zipline
+We need Re-Implement All Features instead of old ways
 
-modify zipline config located in ~/.zipline/extension.py
-
-and add
-
-```
-from zipline_cn_databundle import register_cn_bundle_from_yahoo
-
-register_cn_bundle_from_yahoo('cn_exchange_yahoo')
-```
-
-the first time you used databundle, we will download and check availablity from yahoo.
-we and the second time you use this api ,we will use cached symbol list directly,
-if you prefer update the data list or do not use the cached version, you could use:
-
-```
- register_cn_bundle_from_yahoo('cn_exchange_yahoo', cache=False)
-```
-instead
-
-and if you wanna fetch and cache the info before use it, you can run command in console:
-
-`zipline-cn-databundle-update`
-
-```
-> zipline-cn-databundle-update
-Start to fetch data and update cache
-Get All Stock List.....
-Check availablity from Yahoo...
-300533.SZ ok!
-...
-....
-```
+Working in progress!!!!
 
 ### Others
 

@@ -17,14 +17,14 @@ ZIPLINE_TL_TOKEN
 
 """
 
-
+"""
 ZIPLINE_TL_TOKEN = os.environ.get('ZIPLINE_TL_TOKEN')
 
 if not ZIPLINE_TL_TOKEN:
     raise Exception("no datayes token in envirionment ZIPLINE_TL_TOKEN,  we need this token to fetch ajustments data")
 
 ts.set_token('ZIPLINE_TL_TOKEN')
-
+"""
 
 def tushare_bundle(environ,
                   asset_db_writer,
