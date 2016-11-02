@@ -2,7 +2,7 @@ import click
 import tushare as ts
 import pandas as pd
 import os
-from .squant_source import load_splits_and_dividends
+from .squant_source import load_splits_and_dividends, zipline_splits_and_dividends
 
 """
 从tushare获取股票信息
@@ -44,22 +44,7 @@ def tushare_bundle(environ,
     # 准备写入dailybar
     daily_bar_writer.write(get_hist_data(symbol_map, histories, start_session, end_session), show_progress=show_progress)
     # 送股,分红数据, 从squant 获取
-    raw_splits, raw_dividends = load_splits_and_dividends()
-    splits = []
-    dividends = []
-    for sid, code in symbol_map.iteritems():
-        if code in raw_splits:
-            split = pd.DataFrame(data=raw_splits[code])
-            split['sid'] = sid
-            split.index = split['effective_date'] = pd.DatetimeIndex(split['effective_date'])
-            splits.append(split)
-        if code in raw_dividends:
-            dividend = pd.DataFrame(data = raw_dividends[code])
-            dividend['sid'] = sid
-            dividend['record_date'] = dividend['declared_date'] = dividend['pay_date'] = pd.NaT
-            dividend.index = dividend['ex_date'] = pd.DatetimeIndex(dividend['ex_date'])
-            dividends.append(dividend)
-
+    splits, dividends = zipline_splits_and_dividends(symbol_map)
     adjustment_writer.write(
         splits=pd.concat(splits, ignore_index=True),
         dividends=pd.concat(dividends, ignore_index=True),

@@ -1,6 +1,9 @@
 from squant.data.stock import file_parser
+from squant.zipine.datasource import get_symbol_list
 import os
 import datetime
+from .tdx.reader import TdxReader, TdxFileNotFoundException
+import pandas as pd
 
 """
 Squant is a private library that parse the data from our private source
@@ -60,9 +63,99 @@ def load_splits_and_dividends():
     return splits, dividends
 
 
+def zipline_splits_and_dividends(symbol_map):
+    raw_splits, raw_dividends = load_splits_and_dividends()
+    splits = []
+    dividends = []
+    for sid, code in symbol_map.iteritems():
+        if code in raw_splits:
+            split = pd.DataFrame(data=raw_splits[code])
+            split['sid'] = sid
+            split.index = split['effective_date'] = pd.DatetimeIndex(split['effective_date'])
+            splits.append(split)
+        if code in raw_dividends:
+            dividend = pd.DataFrame(data = raw_dividends[code])
+            dividend['sid'] = sid
+            dividend['record_date'] = dividend['declared_date'] = dividend['pay_date'] = pd.NaT
+            dividend.index = dividend['ex_date'] = pd.DatetimeIndex(dividend['ex_date'])
+            dividends.append(dividend)
+    return splits, dividends
+
 def int_to_date(d):
     d = str(d)
     return datetime.date(int(d[:4]), int(d[4:6]), int(d[6:]))
+
+
+def squant_bundle(environ,
+                   asset_db_writer,
+                   minute_bar_writer,
+                   daily_bar_writer,
+                   adjustment_writer,
+                   calendar,
+                   start_session,
+                   end_session,
+                   cache,
+                   show_progress,
+                   output_dir):
+
+    tdx_reader = TdxReader('/Volumes/more/data/vipdoc')
+
+    symbol_df = get_symbol_list()
+    # 只保留未停牌的
+    symbol_df = symbol_df[symbol_df['status'] == False]
+
+    # 由于meta,split,dividend 和 行情数据源不同,所以有可能会不同,所以我们这里统一根据
+
+    symbol_map = symbol_df.simplesymbol
+    # 写入基础信息
+    asset_db_writer.write(symbol_df)
+    # 写入数据文件
+    daily_bar_writer.write(get_hist_data(symbol_df, symbol_map, tdx_reader, start_session, end_session, calendar),
+                           show_progress=show_progress)
+    # split and diviends
+    splits, dividends = zipline_splits_and_dividends(symbol_map)
+
+    # hack for tdx data , for tdx source for shenzhen market, we can not get data before 1991-12-23
+    splits_df = pd.concat(splits, ignore_index=True)
+    dividends_df = pd.concat(dividends, ignore_index=True)
+
+    splits_df= splits_df.loc[splits_df['effective_date'] > start_session]
+    dividends_df = dividends_df.loc[dividends_df['ex_date'] > start_session]
+    adjustment_writer.write(
+        splits=splits_df,
+        dividends=dividends_df,
+    )
+
+def get_hist_data(symbol_df, symbol_map, tdx_reader, start_session, end_session, calendar):
+    for sid, index in symbol_map.iteritems():
+        exchagne = ''
+        if symbol_df.loc[sid]['exchange'] == 'SZSE':
+            exchagne = 'sz'
+        elif symbol_df.loc[sid]['exchange'] == 'SSE':
+            exchagne = 'sh'
+
+        try:
+            history = tdx_reader.get_df(index, exchagne)
+
+            #print('max-min for %s is %s : %s', (index, history.index[0], history.index[-1]))
+            # 去除没有报价信息的内容
+            if history.index[0] > pd.Timestamp((end_session.date())):
+                continue
+        except TdxFileNotFoundException as e:
+            #print('symbol %s file no found, ignore it ' % index)
+            continue
+        # history.to_pickle('/tmp/debug.pickle')
+
+        #reindex
+        sessions = calendar.sessions_in_range(start_session, end_session)
+
+        history = history.reindex(
+            sessions.tz_localize(None),
+            copy=False,
+        ).fillna(0.0)
+
+        yield sid, history.sort_index()
+    pass
 
 if __name__ == '__main__':
 

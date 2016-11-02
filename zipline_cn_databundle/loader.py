@@ -238,7 +238,7 @@ def ensure_benchmark_data(symbol, first_date, last_date, now, trading_day):
         print(symbol)
 
         if str(symbol).upper() in symbol_list:
-            response = requests.get('https://github.com/rainx/cn_index_benchmark_for_zipline/raw/master/data/%s_benchmark.csv' % str(symbol).upper())
+            response = requests.get('https://raw.githubusercontent.com/rainx/cn_index_benchmark_for_zipline/raw/master/data/%s_benchmark.csv' % str(symbol).upper())
             with open(path, 'wb') as fileobj:
                 shutil.copyfileobj(response.raw, fileobj)
 
