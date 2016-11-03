@@ -107,6 +107,19 @@ def squant_bundle(environ,
     # 由于meta,split,dividend 和 行情数据源不同,所以有可能会不同,所以我们这里统一根据
 
     symbol_map = symbol_df.simplesymbol
+
+    # 更新日期信息
+    def update_start_and_end_date(s):
+        start_date = start_session.replace(tzinfo=None)
+        end_date = end_session.replace(tzinfo=None)
+        if s.start_date < start_date:
+            s.start_date = start_date
+        if s.end_date == pd.Timestamp('1900-01-01') or s.end_date is pd.NaT:
+            s.end_date = end_date
+        return s
+    symbol_df = symbol_df.apply(func=update_start_and_end_date, axis=1)
+
+
     # 写入基础信息
     asset_db_writer.write(symbol_df)
     # 写入数据文件

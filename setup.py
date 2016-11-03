@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = "zipline-cn-databundle",
-    version = "0.2",
+    version = "0.3",
     author= 'RainX',
     description='ingest zipline databundle source for chinese market',
     packages = find_packages(),

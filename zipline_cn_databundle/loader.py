@@ -79,6 +79,7 @@ def has_data_for_dates(series_or_df, first_date, last_date):
     if not isinstance(dts, pd.DatetimeIndex):
         raise TypeError("Expected a DatetimeIndex, but got %s." % type(dts))
     first, last = dts[[0, -1]]
+    print(first.tzinfo, first_date.tzinfo)
     return (first <= first_date) and (last >= last_date)
 
 
@@ -212,7 +213,7 @@ def ensure_benchmark_data(symbol, first_date, last_date, now, trading_day):
                     "Refusing to download new benchmark data because a "
                     "download succeeded at %s." % last_download_time
                 )
-                return data
+                return datals -
 
         except (OSError, IOError, ValueError) as e:
             # These can all be raised by various versions of pandas on various
@@ -234,14 +235,14 @@ def ensure_benchmark_data(symbol, first_date, last_date, now, trading_day):
     try:
 
         symbol_list = get_list().symbol.values
-        print(symbol_list)
-        print(symbol)
 
         if str(symbol).upper() in symbol_list:
-            response = requests.get('https://raw.githubusercontent.com/rainx/cn_index_benchmark_for_zipline/raw/master/data/%s_benchmark.csv' % str(symbol).upper())
+            get_url = 'https://raw.githubusercontent.com/rainx/cn_index_benchmark_for_zipline/master/data/%s_benchmark.csv' % str(symbol).upper()
+            print("fetch data via url : %s " % get_url)
+            response = requests.get(get_url)
             with open(path, 'wb') as fileobj:
-                shutil.copyfileobj(response.raw, fileobj)
-
+                fileobj.write(response.content)
+            print("length of response is : %s" % len(response.content))
             data = pd.Series.from_csv(path).tz_localize('UTC')
         else:
             #logger.exception('your bm_symbol not in existing symbol list')
