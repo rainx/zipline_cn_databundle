@@ -79,7 +79,7 @@ def has_data_for_dates(series_or_df, first_date, last_date):
     if not isinstance(dts, pd.DatetimeIndex):
         raise TypeError("Expected a DatetimeIndex, but got %s." % type(dts))
     first, last = dts[[0, -1]]
-    print(first.tzinfo, first_date.tzinfo)
+    #print(first.tzinfo, first_date.tzinfo)
     return (first <= first_date) and (last >= last_date)
 
 
@@ -213,7 +213,7 @@ def ensure_benchmark_data(symbol, first_date, last_date, now, trading_day):
                     "Refusing to download new benchmark data because a "
                     "download succeeded at %s." % last_download_time
                 )
-                return datals -
+                return data
 
         except (OSError, IOError, ValueError) as e:
             # These can all be raised by various versions of pandas on various
@@ -316,6 +316,8 @@ def ensure_treasury_data(bm_symbol, first_date, last_date, now):
     try:
         data = get_zipline_format()
         data.to_csv(path)
+        #reload it and convert to UTC tz
+        data = pd.DataFrame.from_csv(path).tz_localize('UTC')
     except (OSError, IOError):
         logger.exception('failed to cache treasury data')
     if not has_data_for_dates(data, first_date, last_date):
