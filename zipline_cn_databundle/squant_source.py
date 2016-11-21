@@ -20,12 +20,18 @@ ipython 3 only
 CQCX_SH = os.environ.get("CQCX_SH")
 CQCX_SZ = os.environ.get("CQCX_SZ")
 
+TDX_DIR = os.environ.get("TDX_DIR")
+
 if not CQCX_SH or not CQCX_SZ:
     raise Exception("need set cqcx file on CQCX_SH CQCX_SZ")
 
 if not os.path.isfile(CQCX_SH) \
     or not os.path.isfile(CQCX_SZ):
     raise Exception("setting CQCX_SH, CQCX_SZ path is not correct")
+
+
+if not TDX_DIR:
+    raise Exception("Please Setting TDX data dir")
 
 CQCX_LIST = (CQCX_SH, CQCX_SZ)
 
@@ -98,7 +104,9 @@ def squant_bundle(environ,
                    show_progress,
                    output_dir):
 
-    tdx_reader = TdxReader('/Volumes/more/data/vipdoc')
+    if not TDX_DIR:
+        TDX_DIR = '/Volumes/more/data/vipdoc'
+    tdx_reader = TdxReader(TDX_DIR)
 
     symbol_df = get_symbol_list()
     # 只保留未停牌的
