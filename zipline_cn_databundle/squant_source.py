@@ -104,8 +104,6 @@ def squant_bundle(environ,
                    show_progress,
                    output_dir):
 
-    if not TDX_DIR:
-        TDX_DIR = '/Volumes/more/data/vipdoc'
     tdx_reader = TdxReader(TDX_DIR)
 
     symbol_df = get_symbol_list()
