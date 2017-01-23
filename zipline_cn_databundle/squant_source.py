@@ -1,5 +1,5 @@
 from squant.data.stock import file_parser
-from squant.zipine.datasource import get_symbol_list
+from squant.zipline.datasource import get_symbol_list
 import os
 import datetime
 from .tdx.reader import TdxReader, TdxFileNotFoundException

@@ -79,11 +79,11 @@ def has_data_for_dates(series_or_df, first_date, last_date):
     if not isinstance(dts, pd.DatetimeIndex):
         raise TypeError("Expected a DatetimeIndex, but got %s." % type(dts))
     first, last = dts[[0, -1]]
-    #print(first.tzinfo, first_date.tzinfo)
-    return (first <= first_date) and (last >= last_date)
+    #ignore first date check
+    return last >= last_date
 
 
-def load_market_data(trading_day=None, trading_days=None, bm_symbol='000001.SS'):
+def load_market_data(trading_day=None, trading_days=None, bm_symbol='000001.SS', trading_day_before=2):
     """
     Load benchmark returns and treasury yield curves for the given calendar and
     benchmark symbol.
@@ -108,6 +108,9 @@ def load_market_data(trading_day=None, trading_days=None, bm_symbol='000001.SS')
     bm_symbol : str, optional
         Symbol for the benchmark index to load.  Defaults to '^GSPC', the Yahoo
         ticker for the S&P 500.
+
+    trading_day_before : int, optional
+        Trading day before is 2 default
 
     Returns
     -------
@@ -144,7 +147,7 @@ def load_market_data(trading_day=None, trading_days=None, bm_symbol='000001.SS')
 
     # We'll attempt to download new data if the latest entry in our cache is
     # before this date.
-    last_date = trading_days[trading_days.get_loc(now, method='ffill') - 2]
+    last_date = trading_days[trading_days.get_loc(now, method='ffill') - trading_day_before]
 
     br = ensure_benchmark_data(
         bm_symbol,

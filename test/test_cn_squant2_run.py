@@ -148,7 +148,7 @@ if __name__ == '__main__':
                 try:
                     print(demjson.encode(perf))
                 except Exception as e:
-                    pprint.pprint(perf)
+                    pprint.pprint(e)
                 print('-' * 40)
 
         pickle.dump(perfs, open('/tmp/raw_perfs.pickle', 'wb'))
